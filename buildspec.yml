@@ -2,7 +2,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 16 # Or your desired Node.js version
+      nodejs: 16
     commands:
       - echo "Installing dependencies"
       - npm install
@@ -10,10 +10,12 @@ phases:
     commands:
       - echo "Building the container image using Buildpacks"
       - curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.31.0/pack-v0.31.0-linux.tgz" | tar xz
-      - ./pack build <ECR_URI>:latest --path . --builder paketobuildpacks/builder:base
+      - ./pack build output-image --path . --builder paketobuildpacks/builder:base
   post_build:
     commands:
-      - echo "Authenticating with ECR"
-      - aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <ECR_URI>
-      - echo "Pushing image to ECR"
-      - docker push <ECR_URI>:latest
+      - echo "Uploading image to ECR using AWS CLI"
+      - aws ecr get-login-password --region us-east-1 | ./pack login --username AWS --password-stdin 637423631641.dkr.ecr.us-east-1.amazonaws.com/sumit/live_clock:latest
+      - ./pack push 637423631641.dkr.ecr.us-east-1.amazonaws.com/sumit/live_clock:latest
+artifacts:
+  files:
+    - "**/*"
