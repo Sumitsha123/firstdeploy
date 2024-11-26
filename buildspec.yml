@@ -1,0 +1,19 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 16 # Or your desired Node.js version
+    commands:
+      - echo "Installing dependencies"
+      - npm install
+  build:
+    commands:
+      - echo "Building the container image using Buildpacks"
+      - curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.31.0/pack-v0.31.0-linux.tgz" | tar xz
+      - ./pack build <ECR_URI>:latest --path . --builder paketobuildpacks/builder:base
+  post_build:
+    commands:
+      - echo "Authenticating with ECR"
+      - aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <ECR_URI>
+      - echo "Pushing image to ECR"
+      - docker push <ECR_URI>:latest
