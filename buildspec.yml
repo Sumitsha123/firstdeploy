@@ -6,21 +6,16 @@ phases:
     commands:
       - echo "Installing dependencies"
       - npm install
-  phases:
-  pre_build:
+    build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 637423631641.dkr.ecr.us-east-1.amazonaws.com
-  build:
-    commands:
-      - echo Building the Docker image...
-      - docker build -t sumit/live_clock:latest .
-      - echo Tagging the Docker image...
-      - docker tag sumit/live_clock:latest 637423631641.dkr.ecr.us-east-1.amazonaws.com/sumit/live_clock:latest
+      - echo "Building the container image using Buildpacks"
+      - curl -sSL "https://github.com/buildpacks/pack/releases/download/v0.31.0/pack-v0.31.0-linux.tgz" | tar xz
+      - ./pack build output-image --path . --builder paketobuildpacks/builder:base
   post_build:
     commands:
-      - echo Pushing the Docker image to Amazon ECR...
-      - docker push 637423631641.dkr.ecr.us-east-1.amazonaws.com/sumit/live_clock:latest
+      - echo "Uploading image to ECR using AWS CLI"
+      - aws ecr get-login-password --region us-east-1 | ./pack login --username AWS --password-stdin 637423631641.dkr.ecr.us-east-1.amazonaws.com/sumit/live_clock:latest
+      - ./pack push 637423631641.dkr.ecr.us-east-1.amazonaws.com/sumit/live_clock:latest
 artifacts:
   files:
     - "**/*"
