@@ -14,12 +14,12 @@ phases:
   build:
     commands:
       - echo Building the Docker image...
-      - docker build -t live_clock:latest .
-      - docker tag live_clock:latest 637423631641.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sumit/live_clock:latest
+      - docker build -t sumit/live_clock .
+      - docker tag sumit/live_clock:latest 637423631641.dkr.ecr.us-east-1.amazonaws.com/sumit/live_clock:latest
   post_build:
     commands:
       - echo Pushing the Docker image to Amazon ECR...
-      - docker push 637423631641.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/sumit/live_clock:latest
+      - docker push 637423631641.dkr.ecr.us-east-1.amazonaws.com/sumit/live_clock:latest
 
 artifacts:
   files:
