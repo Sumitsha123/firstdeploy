@@ -4,7 +4,7 @@ const redis = require("redis");
 // Configure Redis client
 const redisClient = redis.createClient({
   socket: {
-    host: "your-redis-endpoint", // Replace with your Redis endpoint
+    host: "clustercfg.elasti-cache1.n49gq2.use1.cache.amazonaws.com:6379", // Replace with your Redis endpoint
     port: 6379, // Default Redis port
   },
 });
