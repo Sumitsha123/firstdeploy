@@ -1,16 +1,36 @@
 const http = require("http");
-const redis = require("redis");
+const redis = require('redis');
 
-// Configure Redis client
+// Replace 'clustercfg.elasti-cache1.n49gq2.use1.cache.amazonaws.com' with your Redis endpoint
 const redisClient = redis.createClient({
   socket: {
-    host: "clustercfg.elasti-cache1.n49gq2.use1.cache.amazonaws.com", // Replace with your Redis endpoint
-    port: 6379, // Default Redis port
+    host: 'clustercfg.elasti-cache1.n49gq2.use1.cache.amazonaws.com',
+    port: 6379,
   },
 });
 
-// Connect to Redis
-redisClient.connect().catch((err) => console.error("Redis Connection Error:", err));
+redisClient.on('connect', () => {
+  console.log('Connected to Redis');
+});
+
+redisClient.on('error', (err) => {
+  console.error('Redis Connection Error:', err);
+});
+
+(async () => {
+  try {
+    await redisClient.connect();
+
+    // Test Redis set and get operations
+    await redisClient.set('test-key', 'Hello, Redis!');
+    const value = await redisClient.get('test-key');
+    console.log('Redis Test Value:', value);
+
+    // Keep the connection open for the application
+  } catch (err) {
+    console.error('Error during Redis operations:', err);
+  }
+})();
 
 const server = http.createServer(async (req, res) => {
   if (req.url === "/") {
